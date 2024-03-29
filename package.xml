@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>gazebo_ros_motors</name>
   <version>1.1.1</version>
   <description>
@@ -11,27 +12,25 @@
 
   <license>NO</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
   <build_depend>gazebo_dev</build_depend>
-  <exec_depend>gazebo_dev</exec_depend>
+  <exec_depend>gazebo</exec_depend>
 
-  <depend>gazebo_msgs</depend>
-  <depend>geometry_msgs</depend>
+  <depend>gazebo_plugins</depend>
+  <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
-  <depend>std_srvs</depend>
-  <depend>roscpp</depend>
-  <depend>rospy</depend>
-  <depend>nodelet</depend>
-  <depend>angles</depend>
-  <depend>urdf</depend>
-  <depend>tf</depend>
-  <depend>tf2_ros</depend>
-  <depend>dynamic_reconfigure</depend>
-  <depend>rosgraph_msgs</depend>
-  <depend>rosconsole</depend>
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
-  <depend>diagnostic_updater</depend>
+  <depend>gazebo_ros</depend>
   <depend>std_msgs</depend>
+  <depend>nav_msgs</depend>
 
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+	  <build_type>ament_cmake</build_type>
+  </export>
 </package>

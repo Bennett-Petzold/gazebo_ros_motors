@@ -1,0 +1,8 @@
+MotorPlugin:
+  ros__parameters:
+    velocity_noise: 0.0
+    motor_nominal_voltage: 12.0
+    electric_resistance: 1.0
+    moment_of_inertia: 0.001
+    armature_damping_ratio: 0.0001
+    electromotive_force_constant: 0.01

@@ -1,27 +1,9 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(gazebo_ros_motors)
 
-find_package(catkin REQUIRED COMPONENTS
-  gazebo_dev
-  message_generation
-  gazebo_msgs
-  roscpp
-  rospy
-  nodelet
-  angles
-  std_srvs
-  geometry_msgs
-  sensor_msgs
-  nav_msgs
-  urdf
-  tf
-  tf2_ros
-  dynamic_reconfigure
-  rosgraph_msgs
-  rosconsole
-  diagnostic_updater
-  std_msgs
-)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
@@ -33,7 +15,18 @@ else()
   message(FATAL_ERROR "pkg-config is required; please install it")
 endif()
 
-find_package(Boost REQUIRED COMPONENTS thread)
+# find dependencies
+find_package(ament_cmake REQUIRED)
+# uncomment the following section in order to fill in
+# further dependencies manually.
+# find_package(<dependency> REQUIRED)
+find_package(gazebo REQUIRED)
+find_package(gazebo_ros REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 execute_process(COMMAND
   pkg-config --variable=plugindir OGRE
@@ -56,42 +49,24 @@ link_directories(
   ${OGRE-Paging_LIBRARY_DIRS}
 )
 
-generate_dynamic_reconfigure_options(
-  cfg/motorModel.cfg
-)
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES
-  CATKIN_DEPENDS
-  message_runtime
-  gazebo_msgs
-  roscpp
-  rospy
-  nodelet
-  angles
-  std_srvs
-  geometry_msgs
-  sensor_msgs
-  urdf
-  tf
-  tf2_ros
-  dynamic_reconfigure
-  rosgraph_msgs
-  rosconsole
-  std_msgs
-)
+#generate_dynamic_reconfigure_options(
+# cfg/motorModel.cfg
+#)
 
 ###########
 ## Build ##
 ###########
 
+ament_export_dependencies(rosidl_default_runtime)
+
 add_library(gazebo_ros_dc_motor src/gazebo_ros_dc_motor.cpp)
 target_link_libraries(gazebo_ros_dc_motor gazebo_ros_utils ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-add_dependencies(gazebo_ros_dc_motor ${PROJECT_NAME}_gencfg)
+#add_dependencies(gazebo_ros_dc_motor ${PROJECT_NAME}_gencfg)
+ament_target_dependencies(gazebo_ros_dc_motor rclcpp sensor_msgs std_msgs gazebo_ros nav_msgs)
 
 add_library(gazebo_ros_joint_motor src/gazebo_ros_joint_motor.cpp)
 target_link_libraries(gazebo_ros_joint_motor gazebo_ros_utils ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+ament_target_dependencies(gazebo_ros_joint_motor rclcpp sensor_msgs std_msgs gazebo_ros)
 
 ##########
 ## Test ##
@@ -109,19 +84,34 @@ target_link_libraries(gazebo_ros_joint_motor gazebo_ros_utils ${catkin_LIBRARIES
 ## Install ##
 #############
 
+#rosidl_target_interfaces(gazebo_ros_dc_motor ${PROJECT_NAME} "rosidl_typesupport_cpp")
+#rosidl_target_interfaces(gazebo_ros_joint_motor ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
 install(TARGETS
   gazebo_ros_dc_motor
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  DESTINATION lib/${PROJECT_NAME}
   )
 
 install(TARGETS
   gazebo_ros_joint_motor
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  DESTINATION lib/${PROJECT_NAME}
   )
 
-install(DIRECTORY include/
-   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
-   FILES_MATCHING PATTERN "*.h"
-)
+#install(DIRECTORY include/
+	#DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+   #FILES_MATCHING PATTERN "*.h"
+   #)
+
+ament_package()
